@@ -5,14 +5,23 @@ pragma solidity >=0.8.0;
 import "./SillyStringUtils.sol";
 
 contract ImportsExercise {
-    // Private salt for demonstration purposes
-    string private salt = "ccc";
-    
     // Define a variable to store the haiku
     SillyStringUtils.Haiku public haiku;
 
+    // Event emitted when a haiku is saved
+    event HaikuSaved(string line1, string line2, string line3);
+
+    // Modifier to ensure that the caller has paid enough to save a haiku
+    modifier paidEnough() {
+        require(msg.value >= 1 ether, "Insufficient ether sent");
+        _;
+    }
+
     // Function to save a haiku
-    function saveHaiku(string calldata line1, string calldata line2, string calldata line3) public payable {
+    function saveHaiku(string memory line1, string memory line2, string memory line3) public payable paidEnough {
+        // Emit an event to indicate that a haiku has been saved
+        emit HaikuSaved(line1, line2, line3);
+
         // Create a new haiku struct and store it
         haiku = SillyStringUtils.Haiku({
             line1: line1,
@@ -21,7 +30,7 @@ contract ImportsExercise {
         });
     }
 
-    // Function to get the stored haiku
+    // Function to retrieve the stored haiku
     function getHaiku() public view returns(SillyStringUtils.Haiku memory){
         return haiku;
     }
